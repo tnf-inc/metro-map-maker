@@ -4,6 +4,10 @@ Metro Map Maker is a powerful, no-build HTML transit-map designer. It runs direc
 
 Latest version: `0.1.0`
 
+## Run Locally
+
+Open [this page](https://tnf-inc.github.io/metro-map-maker/index.html) on a browser.
+
 ## Features
 
 - Interactive SVG workspace with snap-to-grid station placement
@@ -15,10 +19,6 @@ Latest version: `0.1.0`
 - Export to SVG and JSON
 - Shareable map links through encoded URL hashes
 - Demo map preset for quick exploration
-
-## Run Locally
-
-Open [this page](https://tnf-inc.github.io/metro-map-maker/index.html) on a browser.
 
 ## Versioning
 
