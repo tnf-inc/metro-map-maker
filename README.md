@@ -18,7 +18,7 @@ Latest version: `0.1.0`
 
 ## Run Locally
 
-Open (this page)[https://tnf-inc.github.io/metro-map-maker/index.html] on a browser.
+Open [this page](https://tnf-inc.github.io/metro-map-maker/index.html) on a browser.
 
 ## Versioning
 
