@@ -2,7 +2,7 @@
 
 Metro Map Maker is a powerful, no-build HTML transit-map designer. It runs directly in the browser and lets you draft stylized metro maps with stations, multiple colored lines, labels, themes, undo history, and SVG/JSON exports.
 
-Current version: `0.1.0`
+Latest version: `0.1.0`
 
 ## Features
 
@@ -18,13 +18,7 @@ Current version: `0.1.0`
 
 ## Run Locally
 
-Open `index.html` in a browser, or serve the folder:
-
-```sh
-python3 -m http.server 4174
-```
-
-Then visit `http://127.0.0.1:4174`.
+Open (this page)[https://tnf-inc.github.io/metro-map-maker/index.html] on a browser.
 
 ## Versioning
 
