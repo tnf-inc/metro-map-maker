@@ -8,8 +8,8 @@
       name="description"
       content="Metro Map Maker is a powerful browser-based tool for designing clean transit maps with lines, stations, labels, themes, and exports."
     >
-    <title>Metro Map Maker v0.1.0</title>
-    <link rel="stylesheet" href="styles.css?v=0.1.0">
+    <title>Metro Map Maker v0.5.0</title>
+    <link rel="stylesheet" href="styles.css?v=0.5.0">
   </head>
   <body>
     <main class="app-shell">
@@ -19,7 +19,7 @@
             <p class="eyebrow">Metro Map Maker</p>
             <h1>Design Console</h1>
           </div>
-          <span class="version-badge">v0.1.0</span>
+          <span class="version-badge">v0.5.0</span>
         </header>
 
         <section class="control-section" aria-labelledby="tool-heading">
@@ -28,13 +28,18 @@
             <span id="statusText" class="status-pill">Ready</span>
           </div>
           <div class="segmented" role="group" aria-label="Drawing mode">
-            <button class="segment is-active" type="button" data-tool="select">Select</button>
-            <button class="segment" type="button" data-tool="station">Station</button>
-            <button class="segment" type="button" data-tool="line">Line</button>
+            <button class="segment is-active" type="button" data-tool="select" title="Select stations and line segments">Select</button>
+            <button class="segment" type="button" data-tool="station" title="Add standalone stations">Add</button>
+            <button class="segment" type="button" data-tool="connect" title="Connect two stations with the active line">Connect</button>
+            <button class="segment" type="button" data-tool="pan" title="Pan the canvas">Pan</button>
           </div>
           <div class="button-row">
             <button id="undoButton" class="ghost-button" type="button" title="Undo last action">Undo</button>
             <button id="clearButton" class="danger-button" type="button" title="Clear the whole map">Clear</button>
+          </div>
+          <div class="button-row">
+            <button id="zoomInButton" class="ghost-button" type="button" title="Zoom in">Zoom +</button>
+            <button id="zoomOutButton" class="ghost-button" type="button" title="Zoom out">Zoom -</button>
           </div>
         </section>
 
@@ -51,6 +56,7 @@
             <span>Color</span>
             <input id="lineColorInput" type="color">
           </label>
+          <p id="lineHint" class="hint">Select a line, name it, then connect two stations.</p>
           <div id="lineList" class="line-list" aria-label="Metro lines"></div>
         </section>
 
@@ -67,7 +73,7 @@
             <button id="renameStationButton" class="ghost-button" type="button">Rename</button>
             <button id="deleteStationButton" class="danger-button" type="button">Delete</button>
           </div>
-          <p id="selectionHint" class="hint">Select a station or click the canvas to create one.</p>
+          <p id="selectionHint" class="hint">Selection details appear here.</p>
         </section>
 
         <section class="control-section" aria-labelledby="style-heading">
@@ -97,13 +103,17 @@
         <section class="control-section" aria-labelledby="export-heading">
           <h2 id="export-heading">Export</h2>
           <div class="button-grid">
-            <button id="exportSvgButton" class="ghost-button" type="button">SVG</button>
+            <button id="exportPngButton" class="ghost-button" type="button">PNG</button>
             <button id="exportJsonButton" class="ghost-button" type="button">JSON</button>
+            <button id="importJsonButton" class="ghost-button" type="button">Import</button>
             <button id="loadDemoButton" class="ghost-button" type="button">Demo</button>
             <button id="copyShareButton" class="ghost-button" type="button">Share</button>
           </div>
+          <input id="importJsonInput" class="sr-only" type="file" accept="application/json,.json">
         </section>
       </aside>
+
+      <div id="sidebarResizer" class="sidebar-resizer" role="separator" aria-label="Resize toolbar" aria-orientation="vertical" tabindex="0"></div>
 
       <section class="workspace" aria-label="Metro map workspace">
         <header class="topbar">
@@ -111,10 +121,17 @@
             <p class="eyebrow">Workspace</p>
             <h2 id="mapTitleDisplay">Harbor Loop Draft</h2>
           </div>
-          <div class="metrics" aria-label="Map metrics">
-            <span><strong id="stationCount">0</strong> stations</span>
-            <span><strong id="lineCount">0</strong> lines</span>
-            <span><strong id="connectionCount">0</strong> segments</span>
+          <div class="topbar-actions">
+            <div class="metrics" aria-label="Map metrics">
+              <span><strong id="stationCount">0</strong> stations</span>
+              <span><strong id="lineCount">0</strong> lines</span>
+              <span><strong id="connectionCount">0</strong> segments</span>
+            </div>
+            <div class="appearance-switch" role="group" aria-label="Appearance">
+              <button class="appearance-option is-active" type="button" data-appearance="system">System</button>
+              <button class="appearance-option" type="button" data-appearance="light">Light</button>
+              <button class="appearance-option" type="button" data-appearance="dark">Dark</button>
+            </div>
           </div>
         </header>
 
@@ -131,6 +148,6 @@
       </button>
     </template>
 
-    <script src="app.js?v=0.1.0"></script>
+    <script src="app.js?v=0.5.0"></script>
   </body>
 </html>
