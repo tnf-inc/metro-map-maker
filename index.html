@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#15212e">
+    <meta
+      name="description"
+      content="Metro Map Maker is a powerful browser-based tool for designing clean transit maps with lines, stations, labels, themes, and exports."
+    >
+    <title>Metro Map Maker v0.1.0</title>
+    <link rel="stylesheet" href="styles.css?v=0.1.0">
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar" aria-label="Metro map controls">
+        <header class="brand-panel">
+          <div>
+            <p class="eyebrow">Metro Map Maker</p>
+            <h1>Design Console</h1>
+          </div>
+          <span class="version-badge">v0.1.0</span>
+        </header>
+
+        <section class="control-section" aria-labelledby="tool-heading">
+          <div class="section-heading">
+            <h2 id="tool-heading">Tools</h2>
+            <span id="statusText" class="status-pill">Ready</span>
+          </div>
+          <div class="segmented" role="group" aria-label="Drawing mode">
+            <button class="segment is-active" type="button" data-tool="select">Select</button>
+            <button class="segment" type="button" data-tool="station">Station</button>
+            <button class="segment" type="button" data-tool="line">Line</button>
+          </div>
+          <div class="button-row">
+            <button id="undoButton" class="ghost-button" type="button" title="Undo last action">Undo</button>
+            <button id="clearButton" class="danger-button" type="button" title="Clear the whole map">Clear</button>
+          </div>
+        </section>
+
+        <section class="control-section" aria-labelledby="line-heading">
+          <div class="section-heading">
+            <h2 id="line-heading">Line</h2>
+            <button id="addLineButton" class="icon-text-button" type="button">Add Line</button>
+          </div>
+          <label class="field">
+            <span>Name</span>
+            <input id="lineNameInput" type="text" maxlength="28" autocomplete="off">
+          </label>
+          <label class="field">
+            <span>Color</span>
+            <input id="lineColorInput" type="color">
+          </label>
+          <div id="lineList" class="line-list" aria-label="Metro lines"></div>
+        </section>
+
+        <section class="control-section" aria-labelledby="station-heading">
+          <div class="section-heading">
+            <h2 id="station-heading">Station</h2>
+            <button id="addStationButton" class="icon-text-button" type="button">Add Station</button>
+          </div>
+          <label class="field">
+            <span>Name</span>
+            <input id="stationNameInput" type="text" maxlength="32" autocomplete="off">
+          </label>
+          <div class="button-row">
+            <button id="renameStationButton" class="ghost-button" type="button">Rename</button>
+            <button id="deleteStationButton" class="danger-button" type="button">Delete</button>
+          </div>
+          <p id="selectionHint" class="hint">Select a station or click the canvas to create one.</p>
+        </section>
+
+        <section class="control-section" aria-labelledby="style-heading">
+          <h2 id="style-heading">Style</h2>
+          <label class="toggle">
+            <input id="gridToggle" type="checkbox" checked>
+            <span>Grid</span>
+          </label>
+          <label class="toggle">
+            <input id="labelsToggle" type="checkbox" checked>
+            <span>Station labels</span>
+          </label>
+          <label class="field">
+            <span>Map title</span>
+            <input id="mapTitleInput" type="text" maxlength="36" autocomplete="off">
+          </label>
+          <label class="field">
+            <span>Background</span>
+            <select id="themeSelect">
+              <option value="paper">Paper</option>
+              <option value="midnight">Midnight</option>
+              <option value="signal">Signal Room</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="control-section" aria-labelledby="export-heading">
+          <h2 id="export-heading">Export</h2>
+          <div class="button-grid">
+            <button id="exportSvgButton" class="ghost-button" type="button">SVG</button>
+            <button id="exportJsonButton" class="ghost-button" type="button">JSON</button>
+            <button id="loadDemoButton" class="ghost-button" type="button">Demo</button>
+            <button id="copyShareButton" class="ghost-button" type="button">Share</button>
+          </div>
+        </section>
+      </aside>
+
+      <section class="workspace" aria-label="Metro map workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Workspace</p>
+            <h2 id="mapTitleDisplay">Harbor Loop Draft</h2>
+          </div>
+          <div class="metrics" aria-label="Map metrics">
+            <span><strong id="stationCount">0</strong> stations</span>
+            <span><strong id="lineCount">0</strong> lines</span>
+            <span><strong id="connectionCount">0</strong> segments</span>
+          </div>
+        </header>
+
+        <div class="canvas-frame">
+          <svg id="mapCanvas" role="img" aria-label="Interactive metro map canvas" viewBox="0 0 1200 760"></svg>
+        </div>
+      </section>
+    </main>
+
+    <template id="lineButtonTemplate">
+      <button class="line-chip" type="button">
+        <span class="swatch"></span>
+        <span class="line-chip-name"></span>
+      </button>
+    </template>
+
+    <script src="app.js?v=0.1.0"></script>
+  </body>
+</html>
