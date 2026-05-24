@@ -8,8 +8,8 @@
       name="description"
       content="Metro Map Maker is a powerful browser-based tool for designing clean transit maps with lines, stations, labels, themes, and exports."
     >
-    <title>Metro Map Maker v0.5.0</title>
-    <link rel="stylesheet" href="styles.css?v=0.5.0">
+    <title>Metro Map Maker v0.5.5</title>
+    <link rel="stylesheet" href="styles.css?v=0.5.5">
   </head>
   <body>
     <main class="app-shell">
@@ -19,7 +19,7 @@
             <p class="eyebrow">Metro Map Maker</p>
             <h1>Design Console</h1>
           </div>
-          <span class="version-badge">v0.5.0</span>
+          <span class="version-badge">v0.5.5</span>
         </header>
 
         <section class="control-section" aria-labelledby="tool-heading">
@@ -31,7 +31,6 @@
             <button class="segment is-active" type="button" data-tool="select" title="Select stations and line segments">Select</button>
             <button class="segment" type="button" data-tool="station" title="Add standalone stations">Add</button>
             <button class="segment" type="button" data-tool="connect" title="Connect two stations with the active line">Connect</button>
-            <button class="segment" type="button" data-tool="pan" title="Pan the canvas">Pan</button>
           </div>
           <div class="button-row">
             <button id="undoButton" class="ghost-button" type="button" title="Undo last action">Undo</button>
@@ -69,9 +68,14 @@
             <span>Name</span>
             <input id="stationNameInput" type="text" maxlength="32" autocomplete="off">
           </label>
+          <div id="interchangeRotationRow" class="button-row" style="display:none">
+            <div class="segmented" role="group" aria-label="Interchange orientation" style="grid-column: 1 / -1; grid-template-columns: repeat(2, 1fr)">
+              <button class="segment is-active" type="button" data-rotation="horizontal">Horizontal</button>
+              <button class="segment" type="button" data-rotation="vertical">Vertical</button>
+            </div>
+          </div>
           <div class="button-row">
-            <button id="renameStationButton" class="ghost-button" type="button">Rename</button>
-            <button id="deleteStationButton" class="danger-button" type="button">Delete</button>
+            <button id="deleteStationButton" class="danger-button" type="button" style="grid-column: 1 / -1">Delete</button>
           </div>
           <p id="selectionHint" class="hint">Selection details appear here.</p>
         </section>
@@ -90,14 +94,6 @@
             <span>Map title</span>
             <input id="mapTitleInput" type="text" maxlength="36" autocomplete="off">
           </label>
-          <label class="field">
-            <span>Background</span>
-            <select id="themeSelect">
-              <option value="paper">Paper</option>
-              <option value="midnight">Midnight</option>
-              <option value="signal">Signal Room</option>
-            </select>
-          </label>
         </section>
 
         <section class="control-section" aria-labelledby="export-heading">
@@ -105,10 +101,16 @@
           <div class="button-grid">
             <button id="exportPngButton" class="ghost-button" type="button">PNG</button>
             <button id="exportJsonButton" class="ghost-button" type="button">JSON</button>
-            <button id="importJsonButton" class="ghost-button" type="button">Import</button>
             <button id="loadDemoButton" class="ghost-button" type="button">Demo</button>
-            <button id="copyShareButton" class="ghost-button" type="button">Share</button>
           </div>
+        </section>
+
+        <section class="control-section" aria-labelledby="import-heading">
+          <h2 id="import-heading">Import</h2>
+          <button id="importJsonButton" class="drop-zone" type="button">
+            <strong>Drop JSON here</strong>
+            <span>or choose a map file</span>
+          </button>
           <input id="importJsonInput" class="sr-only" type="file" accept="application/json,.json">
         </section>
       </aside>
@@ -127,10 +129,22 @@
               <span><strong id="lineCount">0</strong> lines</span>
               <span><strong id="connectionCount">0</strong> segments</span>
             </div>
-            <div class="appearance-switch" role="group" aria-label="Appearance">
-              <button class="appearance-option is-active" type="button" data-appearance="system">System</button>
-              <button class="appearance-option" type="button" data-appearance="light">Light</button>
-              <button class="appearance-option" type="button" data-appearance="dark">Dark</button>
+            <div class="display-controls">
+              <button id="settingsButton" class="icon-button" type="button" aria-label="Display settings" aria-expanded="false">Settings</button>
+              <div class="appearance-switch" role="group" aria-label="Appearance">
+                <button class="appearance-option is-active" type="button" data-appearance="system">System</button>
+                <button class="appearance-option" type="button" data-appearance="light">Light</button>
+                <button class="appearance-option" type="button" data-appearance="dark">Dark</button>
+              </div>
+            </div>
+            <div id="settingsPanel" class="settings-panel" hidden>
+              <label class="field">
+                <span>Line Turn Radius</span>
+                <div class="settings-range-row">
+                  <input id="lineTurnRadiusInput" type="range" min="0" max="120" step="1">
+                  <output id="lineTurnRadiusValue" for="lineTurnRadiusInput">0</output>
+                </div>
+              </label>
             </div>
           </div>
         </header>
@@ -148,6 +162,6 @@
       </button>
     </template>
 
-    <script src="app.js?v=0.5.0"></script>
+    <script src="app.js?v=0.5.5"></script>
   </body>
 </html>
