@@ -24,7 +24,8 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   color: var(--ink);
   background:
     linear-gradient(135deg, rgba(20, 108, 148, 0.13), transparent 34%),
@@ -42,6 +43,7 @@ body.app-dark {
   --control: #22303d;
   --app-bg: #0d141b;
   --shell: rgba(16, 24, 32, 0.86);
+  --canvas: #101a22;
   --accent: #4da3c8;
   --accent-ink: #071018;
   --danger: #d45762;
@@ -63,8 +65,9 @@ button {
   display: grid;
   grid-template-columns: var(--sidebar-width) 8px minmax(0, 1fr);
   gap: 10px;
-  min-height: 100vh;
+  height: 100dvh;
   padding: 18px;
+  overflow: hidden;
 }
 
 .sidebar,
@@ -78,7 +81,9 @@ button {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  overflow: auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 14px;
   background: color-mix(in srgb, var(--panel) 92%, transparent);
 }
@@ -153,7 +158,7 @@ h2 {
 
 .segmented {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 5px;
   padding: 5px;
   border: 1px solid #cfd8e2;
@@ -282,6 +287,7 @@ h2 {
   grid-template-rows: auto minmax(0, 1fr);
   gap: 14px;
   min-width: 0;
+  min-height: 0;
   padding: 14px;
   background: var(--shell);
 }
@@ -316,6 +322,7 @@ h2 {
   display: grid;
   justify-items: end;
   gap: 8px;
+  position: relative;
 }
 
 .metrics {
@@ -344,6 +351,60 @@ h2 {
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--panel-2);
+}
+
+.display-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-button {
+  min-height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  color: var(--muted);
+  background: var(--panel-2);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.icon-button.is-active {
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.settings-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 5;
+  width: min(320px, calc(100vw - 48px));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.settings-range-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-range-row input[type="range"] {
+  width: 100%;
+}
+
+.settings-range-row output {
+  min-width: 36px;
+  text-align: right;
+  color: var(--ink);
+  font-weight: 740;
 }
 
 .appearance-option {
@@ -378,6 +439,11 @@ h2 {
   height: 100%;
   min-height: 520px;
   touch-action: none;
+  cursor: grab;
+}
+
+#mapCanvas.is-panning {
+  cursor: grabbing;
 }
 
 .station-hit {
@@ -407,7 +473,15 @@ h2 {
 
 .interchange-capsule {
   fill: #ffffff;
-  stroke-width: 6;
+  stroke: #0b0f14;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 5;
+}
+
+.interchange-color-dot {
+  stroke: #ffffff;
+  stroke-width: 2;
 }
 
 .station-label {
@@ -418,6 +492,10 @@ h2 {
   stroke: rgba(255, 255, 255, 0.88);
   stroke-width: 7px;
   stroke-linejoin: round;
+}
+
+body.app-dark .station-label {
+  stroke: rgba(7, 12, 18, 0.88);
 }
 
 .line-path {
@@ -431,20 +509,87 @@ h2 {
 .segment-hit {
   cursor: pointer;
   fill: none;
-  stroke: transparent;
+  stroke: rgba(0, 0, 0, 0.001);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 36;
+  pointer-events: stroke;
 }
 
 .selected-segment-line {
   fill: none;
-  stroke: var(--focus);
+  stroke: #7cc5ff;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 28;
-  opacity: 0.35;
+  opacity: 0.45;
   pointer-events: none;
+}
+
+.selected-lss-guide {
+  fill: none;
+  stroke: #ffd257;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 7;
+  stroke-dasharray: 14 9;
+  pointer-events: none;
+}
+
+.segment-node {
+  fill: #ffffff;
+  stroke: #8ec8ff;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.segment-node-bend {
+  fill: #d8eeff;
+  stroke: #8ec8ff;
+  pointer-events: auto;
+  cursor: move;
+}
+
+.segment-direction-dot {
+  fill: rgba(13, 31, 49, 0.9);
+  stroke: #8ec8ff;
+  stroke-width: 1.5;
+  cursor: pointer;
+}
+
+.segment-direction-dot.is-active {
+  fill: #8ec8ff;
+}
+
+.segment-direction-slash {
+  stroke: #8ec8ff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  cursor: pointer;
+}
+
+.segment-direction-slash.is-active {
+  stroke: #0a1f32;
+}
+
+.label-pos-handle {
+  fill: rgba(13, 31, 49, 0.9);
+  stroke: #8ec8ff;
+  stroke-width: 1.5;
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.label-pos-handle-hit {
+  fill: transparent;
+  stroke: transparent;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.label-pos-handle.is-active {
+  fill: #8ec8ff;
+  stroke: #ffffff;
 }
 
 .connect-pending .selection-ring {
@@ -454,6 +599,47 @@ h2 {
 .grid-line {
   stroke: rgba(100, 112, 125, 0.18);
   stroke-width: 1;
+}
+
+body.app-dark .grid-line {
+  stroke: rgba(168, 186, 200, 0.16);
+}
+
+.drop-zone {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  min-height: 82px;
+  padding: 16px;
+  color: var(--ink);
+  border: 1px dashed color-mix(in srgb, var(--accent) 54%, var(--line));
+  border-radius: var(--radius-inner);
+  background: color-mix(in srgb, var(--control) 78%, var(--accent) 10%);
+  text-align: left;
+}
+
+.drop-zone strong,
+.drop-zone span {
+  pointer-events: none;
+}
+
+.drop-zone strong {
+  font-size: 0.98rem;
+}
+
+.drop-zone span {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.drop-zone.is-dragging {
+  color: var(--accent-ink);
+  border-style: solid;
+  background: var(--accent);
+}
+
+.drop-zone.is-dragging span {
+  color: color-mix(in srgb, var(--accent-ink) 78%, transparent);
 }
 
 .theme-midnight {
@@ -466,6 +652,13 @@ h2 {
   --ink: #18212a;
   --muted: #6a706d;
   --canvas: #edf4ef;
+}
+
+body.app-dark.theme-signal,
+body.app-dark:not(.theme-midnight) {
+  --ink: #eef5f8;
+  --muted: #a8bac8;
+  --canvas: #101a22;
 }
 
 :focus-visible {
@@ -483,8 +676,17 @@ h2 {
 }
 
 @media (max-width: 920px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
   .app-shell {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
   }
 
   .sidebar-resizer {
@@ -500,7 +702,17 @@ h2 {
     flex-direction: column;
   }
 
+  .topbar-actions {
+    justify-items: start;
+    width: 100%;
+  }
+
   .metrics {
     justify-content: flex-start;
+  }
+
+  .settings-panel {
+    left: 0;
+    right: auto;
   }
 }
