@@ -1,6 +1,7 @@
 const APP_VERSION = "0.5.5";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "metro-map-maker:data:v1";
+const GRID_SIZE = 80;
 
 const defaultState = {
     title: "Harbor Loop Draft",
@@ -11,7 +12,7 @@ const defaultState = {
     connectStartStationId: null,
     showGrid: true,
     showLabels: true,
-    lineTurnRadius: 24,
+    lineTurnRadius: 0.3,
     uiTheme: "system",
     theme: "paper",
     viewport: { x: 0, y: 0, width: 1200, height: 760 },
@@ -83,6 +84,8 @@ let isRestoring = false;
 let lastGestureScale = 1;
 let settingsPanelOpen = false;
 const PAN_DRAG_THRESHOLD = 4;
+const SIDEBAR_MIN_WIDTH = 280;
+const SIDEBAR_MAX_WIDTH = 520;
 const systemDarkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 function saveHistory() {
@@ -100,6 +103,24 @@ function saveHistory() {
     if (state.history.length > 60) {
         state.history.shift();
     }
+}
+
+function clampTurnRadiusUnits(value) {
+    return Math.max(0, Math.min(120, value));
+}
+
+function normalizeTurnRadiusUnits(value) {
+    if (!Number.isFinite(value)) {
+        return defaultState.lineTurnRadius;
+    }
+    const units = value > 6 ? value / GRID_SIZE : value;
+    return clampTurnRadiusUnits(units);
+}
+
+function formatUnits(value) {
+    const rounded = Math.round(value * 10) / 10;
+    const text = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+    return `${text} units`;
 }
 
 function restore(snapshot) {
@@ -610,7 +631,7 @@ function segmentPathOffset(line, index, start, end, offsets) {
     const allOffsetsMatch = offsetValues.every((value) => value === firstOffset);
     if (allOffsetsMatch) {
         const shiftedPoints = offsetPoints(waypoints, firstOffset);
-        return roundedPolylinePath(shiftedPoints, state.lineTurnRadius);
+        return roundedPolylinePath(shiftedPoints, state.lineTurnRadius * GRID_SIZE);
     }
     return waypoints.slice(1).map((point, index) => {
         const shifted = offsetPoints([waypoints[index], point], offsetValues[index]);
@@ -1029,9 +1050,9 @@ function renderControls() {
     els.mapTitleDisplay.textContent = state.title;
     els.grid.checked = state.showGrid;
     els.labels.checked = state.showLabels;
-    const turnRadius = Number.isFinite(state.lineTurnRadius) ? state.lineTurnRadius : 24;
+    const turnRadius = Number.isFinite(state.lineTurnRadius) ? state.lineTurnRadius : defaultState.lineTurnRadius;
     els.lineTurnRadiusInput.value = String(turnRadius);
-    els.lineTurnRadiusValue.value = String(turnRadius);
+    els.lineTurnRadiusValue.value = formatUnits(turnRadius);
     els.settingsPanel.hidden = !settingsPanelOpen;
     els.settingsButton.classList.toggle("is-active", settingsPanelOpen);
     els.settingsButton.setAttribute("aria-expanded", settingsPanelOpen ? "true" : "false");
@@ -1064,8 +1085,17 @@ function renderControls() {
     document.body.classList.toggle("theme-midnight", state.theme === "midnight");
     document.body.classList.toggle("theme-signal", state.theme === "signal");
     document.body.classList.toggle("connect-pending", Boolean(state.connectStartStationId));
+    const sidebarWidth = state.sidebarWidth || 340;
+    const atSidebarMin = sidebarWidth <= SIDEBAR_MIN_WIDTH;
+    const atSidebarMax = sidebarWidth >= SIDEBAR_MAX_WIDTH;
+    els.sidebarResizer.classList.toggle("at-min", atSidebarMin);
+    els.sidebarResizer.classList.toggle("at-max", atSidebarMax);
+    els.sidebarResizer.setAttribute(
+        "aria-label",
+        atSidebarMin ? "Resize toolbar right" : atSidebarMax ? "Resize toolbar left" : "Resize toolbar"
+    );
     applyUiTheme();
-    document.documentElement.style.setProperty("--sidebar-width", `${state.sidebarWidth || 340}px`);
+    document.documentElement.style.setProperty("--sidebar-width", `${sidebarWidth}px`);
 }
 
 function effectiveUiTheme() {
@@ -1276,7 +1306,7 @@ function loadFromHash() {
         state.theme = map.theme || state.theme;
         state.showGrid = typeof map.showGrid === "boolean" ? map.showGrid : state.showGrid;
         state.showLabels = typeof map.showLabels === "boolean" ? map.showLabels : state.showLabels;
-        state.lineTurnRadius = Number.isFinite(map.lineTurnRadius) ? Math.max(0, Math.min(120, map.lineTurnRadius)) : state.lineTurnRadius;
+        state.lineTurnRadius = normalizeTurnRadiusUnits(map.lineTurnRadius);
         state.viewport = map.viewport || state.viewport;
         state.stations = Array.isArray(map.stations) ? map.stations : state.stations;
         state.lines = Array.isArray(map.lines) ? map.lines : state.lines;
@@ -1328,7 +1358,7 @@ function loadStoredMap() {
         state.uiTheme = map.uiTheme || state.uiTheme;
         state.showGrid = typeof map.showGrid === "boolean" ? map.showGrid : state.showGrid;
         state.showLabels = typeof map.showLabels === "boolean" ? map.showLabels : state.showLabels;
-        state.lineTurnRadius = Number.isFinite(map.lineTurnRadius) ? Math.max(0, Math.min(120, map.lineTurnRadius)) : state.lineTurnRadius;
+        state.lineTurnRadius = normalizeTurnRadiusUnits(map.lineTurnRadius);
         state.theme = map.theme || state.theme;
         state.viewport = map.viewport || state.viewport;
         state.sidebarWidth = map.sidebarWidth || state.sidebarWidth;
@@ -1859,9 +1889,9 @@ els.settingsButton.addEventListener("click", () => {
 });
 
 els.lineTurnRadiusInput.addEventListener("input", () => {
-    const value = Math.max(0, Math.min(120, Number(els.lineTurnRadiusInput.value) || 0));
+    const value = clampTurnRadiusUnits(Number(els.lineTurnRadiusInput.value) || 0);
     state.lineTurnRadius = value;
-    els.lineTurnRadiusValue.value = String(value);
+    els.lineTurnRadiusValue.value = formatUnits(value);
     render();
 });
 
@@ -2103,7 +2133,9 @@ function applyMapData(map) {
     state.theme = map.theme || "paper";
     state.showGrid = typeof map.showGrid === "boolean" ? map.showGrid : true;
     state.showLabels = typeof map.showLabels === "boolean" ? map.showLabels : true;
-    state.lineTurnRadius = Number.isFinite(map.lineTurnRadius) ? Math.max(0, Math.min(120, map.lineTurnRadius)) : 24;
+    state.lineTurnRadius = Number.isFinite(map.lineTurnRadius)
+        ? normalizeTurnRadiusUnits(map.lineTurnRadius)
+        : defaultState.lineTurnRadius;
     state.viewport = map.viewport || { x: 0, y: 0, width: 1200, height: 760 };
     state.stations = map.stations;
     state.lines = map.lines;
@@ -2127,7 +2159,10 @@ window.addEventListener("pointermove", (event) => {
     if (!sidebarResizeStart) {
         return;
     }
-    state.sidebarWidth = Math.max(280, Math.min(520, sidebarResizeStart.width + event.clientX - sidebarResizeStart.x));
+    state.sidebarWidth = Math.max(
+        SIDEBAR_MIN_WIDTH,
+        Math.min(SIDEBAR_MAX_WIDTH, sidebarResizeStart.width + event.clientX - sidebarResizeStart.x)
+    );
     renderControls();
     persist();
 });
