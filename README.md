@@ -6,7 +6,7 @@ Current version: `0.5.5`
 
 ## Run Locally
 
-Open [tnf-inc.github.io/metro-map-maker/] in your browser.
+Open tnf-inc.github.io/metro-map-maker/ in your browser.
 
 ## Features
 
