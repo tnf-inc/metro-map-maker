@@ -2,29 +2,30 @@
 
 Metro Map Maker is a powerful, no-build HTML transit-map designer. It runs directly in the browser and lets you draft stylized metro maps with stations, multiple colored lines, labels, themes, undo history, PNG export, and JSON import/export.
 
-Current version: `0.5.5`
-
-## Run Locally
-
-Open tnf-inc.github.io/metro-map-maker/ in your browser.
+Current version: `0.6.0`
 
 ## Features
 
 - Interactive SVG workspace with snap-to-grid station placement
-- Persistent browser storage that restores your last map
-- System-default light/dark appearance with manual Light and Dark overrides
+- Startup Projects page for creating, opening, renaming, duplicating, and deleting local maps
+- Sunset and Lagoon theme selector on the Projects page
+- Persistent browser storage that saves each project locally
+- Editor shell theme selector shared with the Projects page
+- Settings popover for adjusting line corner radius
 - Pan and wheel-zoom canvas for effectively infinite drafting
 - Select, add-station, connect, and pan modes
 - Multiple named metro lines with editable colors
 - Connect tool for selecting two stations and joining them with the active line
 - Lines render as clean 0/45/90-degree metro-map angles
 - Normal station borders inherit their line color
-- Interchanges use capsule markers with gradient borders from their lines
+- Interchanges use capsule markers with simple black borders
 - Line segment selection and deletion
 - Station rename, drag, and delete
+- Paper, Midnight, and Signal Room themes
 - Versioned app metadata with map-title export filenames
 - Export to PNG and JSON
 - Import JSON maps
+- Shareable map links through encoded URL hashes
 - Demo map preset for quick exploration
 
 ## Hotkeys
@@ -39,17 +40,13 @@ Open tnf-inc.github.io/metro-map-maker/ in your browser.
 - `G`: Toggle grid
 - `+` / `-`: Zoom
 
+## Run Locally
+
+Open tnf-inc.github.io/metro-map-maker/ in your browser.
+
 ## Versioning
 
 This project uses semantic versioning. The app version is visible in:
 
-- `index.html` title and version badge
-- `app.js` as `APP_VERSION`
 - `VERSION`
 - `CHANGELOG.md`
-
-## Roadmap
-
-- Station interchange styling
-- Curved segment controls
-- Printable poster layout presets
